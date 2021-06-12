@@ -1,0 +1,43 @@
+.block {
+    border-left:  3px solid rgb(222 226 230 / 50%);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.1s;
+    position: relative;
+    max-width: 600px;
+}
+
+.block > * {
+    outline: none !important;
+}
+.block:hover {
+    border-left: 3px solid hsl(210deg 14% 60% / 100%)
+}
+
+.block .raw-html {
+}
+
+.block .raw-html textarea {
+    border:  0;
+    padding:  0;
+    background: #002b36;
+    color:  #839496;
+    padding: 1rem;
+    border-radius: 3px;
+    width:  100%;
+    font-family: monospace;
+}
+
+.block .controls {
+    opacity: 0;
+    transition: all 0.1s;
+    user-select: none;
+}
+
+.block:hover .controls { opacity: 1; }
+
+.block .controls {
+    position: absolute;
+    top:  0;
+    right: 0;
+}
