@@ -24,16 +24,15 @@ data BlockEditorController
     | MoveBlockDown { blockId :: !(Id Block) }
     deriving (Eq, Show, Data)
 
-$(deriveSSC ''BlockEditorController)
 $(deriveSSC ''BlockType)
-
+$(deriveSSC ''BlockEditorController)
 
 instance Component BlockEditor BlockEditorController where
     initialState = BlockEditor { postId = "603dc027-6305-4055-bef3-aedaa0fdf3f7", blocks = [] }
 
     componentDidMount state = fetchBlocks state
 
-    
+
     render BlockEditor { postId, blocks } = [hsx|
         <div class="blocks">{forEach orderedBlocks renderBlock}</div>
 
@@ -50,16 +49,15 @@ instance Component BlockEditor BlockEditorController where
         </div>
     |]
         where
-            orderedBlocks = blocks |> sortBy (comparing (get #orderPosition))
-    
+            orderedBlocks = blocks |> sortBy (comparing (.orderPosition))
+
     action state AddBlock { blockType } = do
-        let nextPosition = state
-                |> get #blocks
+        let nextPosition = state.blocks
                 |> lastMay
-                |> maybe 0 (get #orderPosition)
+                |> maybe 0 (.orderPosition)
                 |> (+) 1
         block <- newRecord @Block
-                |> set #postId (get #postId state)
+                |> set #postId state.postId
                 |> set #blockType blockType
                 |> set #orderPosition nextPosition
                 |> \block -> case blockType of
@@ -104,12 +102,12 @@ instance Component BlockEditor BlockEditorController where
         deleteRecord block
 
         fetchBlocks state
-    
+
     action state MoveBlockUp { blockId } = do
         block <- fetch blockId
 
         prevBlock <- query @Block
-                |> filterWhere (#orderPosition, (get #orderPosition block) - 1)
+                |> filterWhere (#orderPosition, block.orderPosition - 1)
                 |> fetchOneOrNothing
 
         case prevBlock of
@@ -131,7 +129,7 @@ instance Component BlockEditor BlockEditorController where
         block <- fetch blockId
 
         nextBlock <- query @Block
-                |> filterWhere (#orderPosition, (get #orderPosition block) + 1)
+                |> filterWhere (#orderPosition, block.orderPosition + 1)
                 |> fetchOneOrNothing
 
         case nextBlock of
@@ -151,7 +149,7 @@ instance Component BlockEditor BlockEditorController where
 
 renderBlock :: Block -> Html
 renderBlock block = [hsx|
-    <div class="block" data-block-id={show (get #id block)}>
+    <div class="block" data-block-id={show block.id}>
         {renderBlockInner block}
 
         <div class="controls">
@@ -182,7 +180,7 @@ renderBlockInner Block { id, blockType = Headline, headlineText = Just text } = 
     </h1>
 |]
 renderBlockInner Block { id, blockType = RawHtml, rawHtml = Just html } = [hsx|
-    <div class="raw-html">    
+    <div class="raw-html">
         <textarea>{preEscapedToHtml html}</textarea>
     </div>
 |]
@@ -194,7 +192,6 @@ renderBlockInner Block { id, blockType = Image, imageSrc = Nothing } = [hsx|
         <div class="form-group">
             <label>Provide an image url:</label>
             <input type="text" placeholder="https://..." class="form-control" name="imageSrc"/>
-            
         </div>
 
         <button class="btn btn-primary mr-4">Use image</button>
