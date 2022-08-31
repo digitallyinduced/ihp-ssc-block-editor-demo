@@ -31,8 +31,8 @@ renderPost :: Post -> Html
 renderPost post = [hsx|
     <tr>
         <td>{post}</td>
-        <td><a href={ShowPostAction (get #id post)}>Show</a></td>
-        <td><a href={EditPostAction (get #id post)} class="text-muted">Edit</a></td>
-        <td><a href={DeletePostAction (get #id post)} class="js-delete text-muted">Delete</a></td>
+        <td><a href={ShowPostAction post.id}>Show</a></td>
+        <td><a href={EditPostAction post.id} class="text-muted">Edit</a></td>
+        <td><a href={DeletePostAction post.id} class="js-delete text-muted">Delete</a></td>
     </tr>
 |]
